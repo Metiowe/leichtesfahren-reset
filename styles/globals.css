@@ -1,10 +1,16 @@
-/* 📦 TailwindCSS Base Styles */
+/* 📦 TailwindCSS Base Styles (v4) */
 @import "tailwindcss";
 
 /* 🎨 Farbschema Variablen */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Akzentfarben (FahrenLeicht) */
+  --fl-sky: #0ea5e9;
+  --fl-indigo: #4f46e5;
+  --fl-emerald: #10b981;
+  --fl-rose: #f43f5e;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -14,14 +20,12 @@
   }
 }
 
-/* 🔤 Custom Font: Negar für Farsi */
+/* 🔤 Custom Fonts */
 @font-face {
   font-family: "Negar";
   src: url("/fonts/Negar.ttf") format("truetype");
   font-display: swap;
 }
-
-/* 🔤 Custom Font: Aileron für Deutsch/Englisch */
 @font-face {
   font-family: "Aileron";
   src: url("/fonts/Aileron-Bold.otf") format("opentype");
@@ -30,7 +34,9 @@
 
 /* 🌐 Grundlayout */
 html {
-  font-family: "Aileron", "Negar", sans-serif;
+  font-family: "Aileron", "Negar", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   background-color: var(--background);
   color: var(--foreground);
   scroll-behavior: smooth;
@@ -42,10 +48,183 @@ body {
   padding: 0;
   background: var(--background);
   color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* 🇮🇷 Farsi Spracheinstellung */
 :lang(fa) {
   font-family: "Negar", "Aileron", sans-serif;
   direction: rtl;
+}
+
+/* ─────────────────────────────────────────────────────────── */
+/* ✨ FahrenLeicht – UI Deko & Helfer                          */
+/* ─────────────────────────────────────────────────────────── */
+
+/* 🌊 Wasserblasen-Hintergrund */
+.bubbles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bubble {
+  position: absolute;
+  bottom: -10vmin;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.08) 60%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  box-shadow: 0 0 30px rgba(14, 165, 233, 0.18),
+    inset 0 0 40px rgba(255, 255, 255, 0.12);
+  filter: blur(0.2px);
+  animation: fl-rise var(--dur, 26s) linear infinite,
+    fl-sway var(--swing, 9s) ease-in-out infinite;
+  animation-delay: calc(var(--delay, 0s) * -1);
+  will-change: transform, opacity;
+}
+
+@keyframes fl-rise {
+  0% {
+    transform: translateY(0) scale(var(--scale, 1));
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(-120vh) scale(var(--scale, 1));
+    opacity: 0;
+  }
+}
+
+@keyframes fl-sway {
+  0%,
+  100% {
+    transform: translateX(-2vw) scale(var(--scale, 1));
+  }
+  50% {
+    transform: translateX(2vw) scale(var(--scale, 1));
+  }
+}
+
+/* 🧊 Glass-Card */
+.glass {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 📊 Passwort-Stärke-Anzeige */
+.meter {
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.meter > span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(
+    90deg,
+    var(--fl-rose),
+    #f59e0b,
+    var(--fl-emerald)
+  );
+  transition: width 0.3s ease;
+}
+
+/* 🔘 Primary Button Gradient (falls ohne Tailwind-Klassen verwendet) */
+.fl-btn {
+  background-image: linear-gradient(90deg, var(--fl-sky), var(--fl-indigo));
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  transition: filter 0.2s ease, transform 0.1s ease;
+}
+.fl-btn:hover {
+  filter: brightness(1.1);
+}
+.fl-btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* ♿️ Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .bubble {
+    animation: none !important;
+    opacity: 0.15;
+  }
+}
+/* Stelle sicher, dass die Bubbles UNTER der Karte sind */
+/* 🌊 Vollflächige Wasserblasen – modern und ruhig */
+.bubbles {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bubble {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.25),
+    rgba(255, 255, 255, 0.08) 55%,
+    rgba(255, 255, 255, 0) 75%
+  );
+  box-shadow: 0 0 40px rgba(14, 165, 233, 0.25),
+    inset 0 0 40px rgba(255, 255, 255, 0.15);
+  filter: blur(0.2px);
+  animation: bubble-rise var(--dur, 28s) linear infinite,
+    bubble-sway var(--sway, 10s) ease-in-out infinite;
+  animation-delay: calc(var(--delay, 0s) * -1);
+  opacity: 0.6;
+  will-change: transform, opacity;
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translateY(0) scale(var(--scale, 1));
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-120vh) scale(var(--scale, 1));
+    opacity: 0;
+  }
+}
+
+@keyframes bubble-sway {
+  0%,
+  100% {
+    transform: translateX(-2vw) scale(var(--scale, 1));
+  }
+  50% {
+    transform: translateX(2vw) scale(var(--scale, 1));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble {
+    animation: none !important;
+    opacity: 0.15;
+  }
 }

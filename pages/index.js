@@ -1,167 +1,165 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import React, { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { FaApple, FaGooglePlay, FaBookOpen, FaUsers } from "react-icons/fa";
+import { FaApple, FaGooglePlay, FaExternalLinkAlt } from "react-icons/fa";
 
-/**
- * 🏠 HomePage – Startseite mit Willkommensnachricht & grüner Erfolgsinfo
- */
 export default function HomePage() {
-  // ✅ Wenn Passwort zurückgesetzt wurde → Hinweis anzeigen
   const [showResetNotice, setShowResetNotice] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const success = localStorage.getItem("passwordResetSuccess");
     if (success === "true") {
       setShowResetNotice(true);
-      localStorage.removeItem("passwordResetSuccess"); // nur einmal zeigen
+      localStorage.removeItem("passwordResetSuccess");
     }
   }, []);
 
+  // 🌊 Bubbles – jetzt überall, mit leichtem Glow & float + rise kombiniert
+  const bubbles = useMemo(() => {
+    if (!mounted) return null;
+
+    const total = 24;
+    return Array.from({ length: total }).map((_, i) => {
+      const size = 6 + Math.random() * 16; // vmin
+      const left = Math.random() * 100; // vw
+      const top = Math.random() * 100; // vh
+      const dur = 20 + Math.random() * 20; // s
+      const delay = Math.random() * 20; // s
+      const sway = 6 + Math.random() * 8; // s
+      const scale = 0.7 + Math.random() * 0.7;
+
+      return (
+        <span
+          key={i}
+          className="bubble"
+          style={{
+            left: `${left}vw`,
+            top: `${top}vh`,
+            width: `${size}vmin`,
+            height: `${size}vmin`,
+            "--dur": `${dur}s`,
+            "--delay": `${delay}s`,
+            "--sway": `${sway}s`,
+            "--scale": scale,
+          }}
+        />
+      );
+    });
+  }, [mounted]);
+
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-purple-100">
-      {/* ✅ Grüner Hinweis nach erfolgreicher Passwortänderung */}
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-black flex flex-col">
+      {/* 🌊 Vollflächige Wasserblasen */}
+      <div
+        className="bubbles pointer-events-none fixed inset-0"
+        aria-hidden="true"
+      >
+        {bubbles}
+      </div>
+
+      {/* ✅ Grüner Hinweis */}
       {showResetNotice && (
-        <div className="bg-green-600 text-white text-center py-3 px-4 font-medium">
-          ✅ Du kannst dich jetzt mit deinem neuen Passwort in der App{" "}
-          <strong>leichtesfahren.pro</strong> einloggen.
+        <div className="z-20 bg-emerald-500/90 text-white text-center py-3 px-4 font-semibold backdrop-blur border-b border-white/10">
+          Passwort aktualisiert – du kannst dich jetzt in der App anmelden.
         </div>
       )}
 
-      {/* 🔝 HEADER – Navigation oben */}
-      <header className="w-full bg-white/90 backdrop-blur-md shadow-md py-4 px-6 flex items-center justify-between">
-        <h1 className="text-lg sm:text-2xl font-bold text-blue-700">
-          leichtesfahren.pro
-        </h1>
+      {/* 🔝 Brand-Header */}
+      <header className="z-10 w-full px-4 pt-8 md:pt-12 flex justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="glass w-full max-w-md rounded-2xl border border-white/10 shadow-lg px-5 py-4 flex flex-col items-center gap-3"
+        >
+          {/* Rundes Logo */}
+          <div className="h-16 w-16 flex items-center justify-center rounded-full bg-white/10 border border-white/10 shadow-md">
+            <Image
+              src="/icon.png"
+              alt="FahrenLeicht Icon"
+              width={48}
+              height={48}
+              className="rounded-full object-cover"
+              priority
+            />
+          </div>
 
-        <nav className="flex gap-4 text-sm sm:text-base">
-          {/* 👥 Teamseite */}
-          <Link href="/team" className="text-blue-600 hover:text-purple-600">
-            <FaUsers className="inline mr-1" /> Team
-          </Link>
-        </nav>
+          <h1 className="text-[26px] md:text-[30px] font-extrabold text-white tracking-tight">
+            FahrenLeicht
+          </h1>
+
+          <p className="text-slate-300/85 text-sm md:text-[15px] text-center">
+            Diese Seite dient ausschließlich zum sicheren Zurücksetzen deines
+            Passworts.
+          </p>
+        </motion.div>
       </header>
 
-      {/* 🎞️ Auto-Image-Slider – mobilfreundlich, kleiner & mit Pause */}
-      <div className="w-full max-w-xs sm:max-w-sm mx-auto mt-6 sm:mt-10 overflow-hidden rounded-xl shadow-lg border border-gray-200 bg-white">
-        <motion.div
-          className="flex"
-          animate={{
-            x: [
-              "0%",
-              "0%", // ⏸️ Pause auf Bild 1
-              "-100%",
-              "-100%", // ⏸️ Pause auf Bild 2
-              "-200%",
-              "-200%", // ⏸️ Pause auf Bild 3
-              "-300%",
-              "-300%", // ⏸️ Pause auf Bild 4
-              "-400%",
-              "-400%", // ⏸️ Pause auf Bild 5
-              "0%",
-            ],
-          }}
-          transition={{
-            duration: 30,
-            ease: "linear",
-            repeat: Infinity,
-            times: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-          }}
-        >
-          {["q1", "q2", "q3", "q4", "q5"].map((img, idx) => (
-            <img
-              key={idx}
-              src={`/images/${img}.png`}
-              alt={`App Screenshot ${idx + 1}`}
-              className="w-full aspect-square object-contain shrink-0"
-            />
-          ))}
-        </motion.div>
-      </div>
-
-      {/* 📱 MAIN-CONTENT – Begrüßung + Download */}
-      <main className="flex-grow flex flex-col items-center justify-center p-6">
-        {/* 🌸 Farsi Begrüßung */}
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
+      {/* 🧊 Haupt-Inhalt */}
+      <main className="z-10 w-full flex-1 px-4 pb-10 mt-6 md:mt-8 flex justify-center">
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="text-center max-w-2xl w-full mb-8"
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="glass w-full max-w-md rounded-3xl border border-white/10 shadow-2xl p-5 md:p-6"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-rose-600 font-negar mb-2">
-            به رانندگی آسان خوش آمدید
+          <h2 className="text-white/95 text-lg md:text-xl font-extrabold mb-2">
+            Willkommen bei FahrenLeicht
           </h2>
-          <p className="text-center text-base sm:text-lg text-gray-800 font-light font-negar leading-relaxed">
-            یک اپلیکیشن برای یادگیری آسان، ایمن و چندزبانه سوالات گواهینامه
-            آلمانی 🇩🇪🇮🇷
+          <p className="text-slate-300/85 text-sm md:text-[15px] mb-5">
+            Diese Seite wird nur für das Zurücksetzen deines Passworts
+            verwendet. Besuche unsere Hauptseite, um mehr über unsere App zu
+            erfahren.
           </p>
-        </motion.div>
 
-        {/* 🇩🇪 Deutsch Begrüßung */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-center max-w-2xl w-full"
-        >
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-blue-700 mb-4">
-            Willkommen bei{" "}
-            <span className="text-purple-500">leichtesfahren.pro</span>
-          </h2>
-          <p className="text-lg sm:text-xl text-gray-700 font-light">
-            Deine App für sicheres, leichtes und mehrsprachiges Lernen der
-            deutschen Führerscheinfragen 🇩🇪🇮🇷
-          </p>
-        </motion.div>
-
-        {/* 📲 Download Buttons */}
-        <motion.div
-          className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
+          {/* 🌐 Haupt-CTA → Webseite */}
           <a
-            href="https://play.google.com/store/apps/details?id=com.leichtesfahren"
+            href="https://leichtesfahren.pro"
             target="_blank"
-            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl shadow-md transition w-full text-center"
+            rel="noreferrer"
+            className="block"
           >
-            <FaGooglePlay /> Google Play
-          </a>
-          <a
-            href="https://apps.apple.com/app/leichtesfahren"
-            target="_blank"
-            className="flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-xl shadow-md transition w-full text-center"
-          >
-            <FaApple /> App Store
-          </a>
-        </motion.div>
-
-        {/* ❓ Fragen testen Button */}
-        <motion.div
-          className="mt-10 w-full max-w-md"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-        >
-          <Link href="/quiz-preview">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 w-full rounded-full shadow-xl text-sm sm:text-base flex items-center justify-center gap-2 animate-bounce"
+            <button
+              className="w-full rounded-2xl py-3 font-extrabold tracking-wide
+                         bg-gradient-to-r from-sky-500 to-indigo-600 hover:brightness-110
+                         text-white transition flex items-center justify-center gap-2"
             >
-              <FaBookOpen className="text-white" /> Fragen ausprobieren
-            </motion.button>
-          </Link>
-        </motion.div>
+              <FaExternalLinkAlt className="opacity-90" />
+              FahrenLeicht-Webseite besuchen
+            </button>
+          </a>
+
+          {/* App Store Links */}
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.leichtesfahren"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-xl px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white flex items-center justify-center gap-2 transition"
+            >
+              <FaGooglePlay />
+              <span className="font-semibold">Google Play</span>
+            </a>
+            <a
+              href="https://apps.apple.com/app/leichtesfahren"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-xl px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white flex items-center justify-center gap-2 transition"
+            >
+              <FaApple />
+              <span className="font-semibold">App Store</span>
+            </a>
+          </div>
+        </motion.section>
       </main>
 
-      {/* 🔻 FOOTER */}
-      <footer className="w-full bg-white/90 backdrop-blur-md text-center text-sm py-4 px-6 text-gray-600 border-t">
-        © {new Date().getFullYear()} leichtesfahren.pro – made with 💙 for alle
-        Lernenden
+      {/* 🔻 Footer */}
+      <footer className="z-10 w-full text-center text-[12.5px] text-slate-400/85 py-5">
+        © {new Date().getFullYear()} FahrenLeicht — Alle Rechte vorbehalten
       </footer>
     </div>
   );

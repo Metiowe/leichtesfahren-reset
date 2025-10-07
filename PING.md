@@ -36,3 +36,17 @@ curl -i -X POST https://leichtesfahren-reset.vercel.app/api/reset/confirm \
 "resetToken":"<falls dein Backend das nutzt>",
 "newPassword":"NeuesPasswort123"
 }'
+
+# YES!
+
+curl -i -X POST 'https://fra.cloud.appwrite.io/v1/account/recovery' \
+ -H 'Content-Type: application/json' \
+ -H 'X-Appwrite-Project: 68ac1cb6000fdd4c3031' \
+ -d '{"email":"metiowen66@gmail.com","url":"https://leichtesfahren-reset.vercel.app/reset"}'
+
+# Starte deinen cURL-Test nochmal:
+
+curl -i -X POST 'https://fra.cloud.appwrite.io/v1/account/recovery' \
+ -H 'Content-Type: application/json' \
+ -H 'X-Appwrite-Project: 68ac1cb6000fdd4c3031' \
+ -d '{"email":"metiowen66@gmail.com","url":"https://leichtesfahren-reset.vercel.app/reset"}'
