@@ -11,7 +11,8 @@ import nodemailer from "nodemailer";
  */
 
 const FROM_NAME = process.env.SMTP_FROM_NAME || "FahrenLeicht Support";
-const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || "support@fahrenleicht.app";
+// ⚠️ Fallback = deine verifizierte Brevo-Adresse (wie beim OTP!)
+const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || "starowen66@gmail.com";
 
 // Brevo / SMTP Config – gleich wie bei deinem OTP-Service
 const SMTP_HOST = process.env.SMTP_HOST || "smtp-relay.brevo.com";
@@ -49,20 +50,17 @@ export default async function handler(req, res) {
     const data = await resp.json().catch(() => ({}));
     if (!resp.ok) {
       console.error("reset-request failed", resp.status, data);
-      return res.status(200).json({
-        ok: true,
-        // nur generische Antwort, damit man nicht bruteforcen kann
-      });
+      // absichtlich generische Antwort
+      return res.status(200).json({ ok: true });
     }
 
     const resetUrl = data.resetUrl;
     if (!resetUrl) {
-      // z.B. wenn Nutzer nicht existiert – trotzdem gleiche Antwort
       console.log("no resetUrl returned (user may not exist)");
       return res.status(200).json({ ok: true });
     }
 
-    // 2️⃣ SMTP Transporter bauen
+    // 2️⃣ SMTP Transporter
     if (!SMTP_USER || !SMTP_PASS) {
       console.error("❌ Missing SMTP_USER / SMTP_PASS env");
       return res.status(500).json({ error: "SMTP not configured" });
@@ -75,7 +73,6 @@ export default async function handler(req, res) {
       auth: { user: SMTP_USER, pass: SMTP_PASS },
     });
 
-    // optional: verify
     await transporter.verify().catch((e) => {
       console.warn("SMTP verify failed (continue anyway):", e?.message || e);
     });
@@ -157,8 +154,7 @@ export default async function handler(req, res) {
       "Wenn du das nicht warst, kannst du diese E-Mail ignorieren.",
     ].join("\n");
 
-    // 3️⃣ Mail senden
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `${FROM_NAME} <${FROM_EMAIL}>`,
       to: email,
       subject: "🔐 Passwort zurücksetzen – FahrenLeicht",
@@ -166,6 +162,7 @@ export default async function handler(req, res) {
       html,
     });
 
+    console.log("✅ reset mail sent", info.messageId || info);
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error("recovery api error", e);
