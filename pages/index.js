@@ -118,7 +118,7 @@ export default function HomePage() {
 
           {/* 🌐 Haupt-CTA → Webseite */}
           <a
-            href="https://leichtesfahren.pro"
+            href="https://www.fahrenleicht.de"
             target="_blank"
             rel="noreferrer"
             className="block"
