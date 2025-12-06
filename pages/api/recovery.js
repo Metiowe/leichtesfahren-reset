@@ -50,13 +50,14 @@ export default async function handler(req, res) {
     const data = await resp.json().catch(() => ({}));
     if (!resp.ok) {
       console.error("reset-request failed", resp.status, data);
-      // absichtlich generische Antwort
+      // absichtlich generische Antwort – keine Infos leaken
       return res.status(200).json({ ok: true });
     }
 
     const resetUrl = data.resetUrl;
     if (!resetUrl) {
       console.log("no resetUrl returned (user may not exist)");
+      // Auch hier: immer ok, damit niemand E-Mails abfragen kann
       return res.status(200).json({ ok: true });
     }
 
@@ -142,8 +143,7 @@ export default async function handler(req, res) {
   </div>
 </div>
 </body>
-</html>
-`.trim();
+</html>`.trim();
 
     const text = [
       "FahrenLeicht – Passwort zurücksetzen",
