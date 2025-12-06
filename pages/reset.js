@@ -1,10 +1,11 @@
+// pages/reset.js
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { account } from "../lib/appwrite";
+import { resetPasswordBackend } from "../lib/api-backend";
 
 const MIN_LEN = 8;
 
@@ -23,7 +24,7 @@ function scorePassword(pw) {
 
 export default function ResetPage() {
   const router = useRouter();
-  const { userId, secret } = router.query;
+  const { userId, token } = router.query; // ⬅️ Wichtig: token statt secret
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -37,11 +38,12 @@ export default function ResetPage() {
   useEffect(() => setMounted(true), []);
 
   const { rules, score } = useMemo(() => scorePassword(password), [password]);
+
   const canSubmit =
-    !!userId && !!secret && password.length >= MIN_LEN && confirm === password;
+    !!userId && !!token && password.length >= MIN_LEN && confirm === password;
 
   async function handleReset() {
-    if (!userId || !secret) {
+    if (!userId || !token) {
       setMsg({ ok: false, text: "❌ Der Link ist ungültig oder abgelaufen." });
       return;
     }
@@ -60,18 +62,31 @@ export default function ResetPage() {
     setBusy(true);
     setMsg(null);
     try {
-      await account.updateRecovery(userId, secret, password, confirm);
+      await resetPasswordBackend({
+        userId: String(userId),
+        token: String(token),
+        newPassword: password,
+      });
+
       setMsg({
         ok: true,
-        text: "✅ Passwort erfolgreich geändert. Weiterleitung…",
+        text: "✅ Passwort erfolgreich geändert. Du kannst dich jetzt in der App anmelden.",
       });
-      localStorage.setItem("passwordResetSuccess", "true");
-      setTimeout(() => router.replace("/"), 1500);
+
+      // kleiner Komfort: Flag setzen, damit deine App-Startseite einen Hinweis zeigen kann
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("passwordResetSuccess", "true");
+      }
+
+      setTimeout(() => {
+        // zurück zur kleinen Home-Seite deines Reset-Projekts
+        router.replace("/");
+      }, 1500);
     } catch (e) {
       const t =
-        e?.message?.toLowerCase?.().includes("expire") ||
-        e?.message?.toLowerCase?.().includes("ablauf")
-          ? "Der Link ist abgelaufen. Bitte fordere einen neuen an."
+        e?.message?.toLowerCase?.().includes("ungültig") ||
+        e?.message?.toLowerCase?.includes("abgelaufen")
+          ? "Reset-Link ungültig oder abgelaufen. Bitte fordere einen neuen an."
           : e?.message || "Unerwarteter Fehler. Bitte erneut versuchen.";
       setMsg({ ok: false, text: `❌ ${t}` });
     } finally {
@@ -110,6 +125,8 @@ export default function ResetPage() {
       );
     });
   }, [mounted]);
+
+  const hasToken = !!userId && !!token;
 
   return (
     <>
@@ -158,7 +175,7 @@ export default function ResetPage() {
               Passwort zurücksetzen
             </h2>
 
-            {!userId || !secret ? (
+            {!hasToken ? (
               <div className="rounded-xl border border-yellow-400/30 bg-yellow-400/10 p-3 text-yellow-200 text-sm">
                 Der Link ist ungültig. Öffne ihn direkt aus der E-Mail oder
                 fordere einen neuen an.
