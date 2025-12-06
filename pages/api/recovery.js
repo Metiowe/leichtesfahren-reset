@@ -79,7 +79,71 @@ export default async function handler(req, res) {
 
     const preheader =
       "Hier kannst du dein Passwort für FahrenLeicht sicher zurücksetzen.";
-    const html = `... DEIN HTML VON OBEN ...`.trim();
+    const html = `
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Passwort zurücksetzen</title>
+<meta name="color-scheme" content="light dark">
+<style>
+  body { margin:0; padding:0; background:#0b1220; }
+  .bg { background:#0b1220; padding:24px; }
+  .card {
+    max-width:520px; margin:0 auto; background:#0f172a;
+    border-radius:16px; overflow:hidden; color:#e5e7eb;
+    font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Inter,Arial,sans-serif;
+  }
+  .header {
+    padding:18px 22px; border-bottom:1px solid rgba(255,255,255,0.06);
+    font-size:16px; font-weight:600;
+  }
+  .content { padding:22px; font-size:14px; line-height:1.6; }
+  .btn-wrap { margin:18px 0 10px; text-align:center; }
+  .btn {
+    display:inline-block; padding:11px 18px; border-radius:999px;
+    background:#0ea5e9; color:#fff !important; text-decoration:none;
+    font-size:14px; font-weight:600;
+  }
+  .link { word-break:break-all; font-size:12px; color:#9ca3af; margin-top:10px; }
+  .footer {
+    padding:14px 22px; font-size:12px; color:#9ca3af;
+    border-top:1px solid rgba(255,255,255,0.06); text-align:center;
+  }
+  @media (prefers-color-scheme: light) {
+    body, .bg { background:#f4f6fb; }
+    .card { background:#ffffff; color:#111827; }
+    .header, .footer { border-color:#e5e7eb; }
+  }
+</style>
+</head>
+<body>
+<span style="display:none!important">${preheader}</span>
+<div class="bg">
+  <div class="card">
+    <div class="header">FahrenLeicht – Passwort zurücksetzen</div>
+    <div class="content">
+      <p>Hallo,</p>
+      <p>du hast eine Zurücksetzung deines Passworts angefordert. Klicke auf den folgenden Button, um ein neues Passwort zu vergeben:</p>
+      <div class="btn-wrap">
+        <a class="btn" href="${resetUrl}" target="_blank" rel="noreferrer">
+          Passwort jetzt zurücksetzen
+        </a>
+      </div>
+      <p class="link">
+        Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br/>
+        ${resetUrl}
+      </p>
+      <p>Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.</p>
+    </div>
+    <div class="footer">
+      Diese E-Mail wurde automatisch von FahrenLeicht gesendet.
+    </div>
+  </div>
+</div>
+</body>
+</html>
+`.trim();
 
     const text = [
       "FahrenLeicht – Passwort zurücksetzen",
