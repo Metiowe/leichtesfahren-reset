@@ -4,13 +4,13 @@ import nodemailer from "nodemailer";
 
 /**
  * Diese API:
- *  - bekommt die E-Mail aus der App
- *  - ruft dein Python-Backend /auth/reset-password-request auf
- *  - Backend erzeugt Token + Reset-URL und gibt sie zurück
- *  - HIER wird die E-Mail mit dem Reset-Link verschickt
+ * - bekommt die E-Mail aus der App
+ * - ruft dein Python-Backend /auth/reset-password-request auf
+ * - Backend erzeugt Token + Reset-URL und gibt sie zurück
+ * - HIER wird die E-Mail mit dem Reset-Link verschickt
  */
 
-const FROM_NAME = process.env.SMTP_FROM_NAME || "FahrenLeicht Support";
+const FROM_NAME = process.env.SMTP_FROM_NAME || "Sorna Support";
 // ⚠️ Fallback = deine verifizierte Brevo-Adresse (wie beim OTP!)
 const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || "starowen66@gmail.com";
 
@@ -34,8 +34,7 @@ export default async function handler(req, res) {
 
   try {
     const backendBase =
-      process.env.NEXT_PUBLIC_API_BASE_URL ||
-      "https://mini-auth-backend.onrender.com";
+      process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.leichtesfahren.pro";
 
     // 1️⃣ Backend: Token + Reset-URL holen
     const resp = await fetch(
@@ -44,7 +43,7 @@ export default async function handler(req, res) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
-      }
+      },
     );
 
     const data = await resp.json().catch(() => ({}));
@@ -79,13 +78,13 @@ export default async function handler(req, res) {
     });
 
     const preheader =
-      "Hier kannst du dein Passwort für FahrenLeicht sicher zurücksetzen.";
+      "Hier kannst du dein Passwort für Sorna sicher zurücksetzen.";
     const html = `
 <!doctype html>
 <html lang="de">
 <head>
 <meta charset="utf-8" />
-<title>Passwort zurücksetzen</title>
+<title>Passwort zurücksetzen – Sorna</title>
 <meta name="color-scheme" content="light dark">
 <style>
   body { margin:0; padding:0; background:#0b1220; }
@@ -122,7 +121,7 @@ export default async function handler(req, res) {
 <span style="display:none!important">${preheader}</span>
 <div class="bg">
   <div class="card">
-    <div class="header">FahrenLeicht – Passwort zurücksetzen</div>
+    <div class="header">Sorna – Passwort zurücksetzen</div>
     <div class="content">
       <p>Hallo,</p>
       <p>du hast eine Zurücksetzung deines Passworts angefordert. Klicke auf den folgenden Button, um ein neues Passwort zu vergeben:</p>
@@ -138,7 +137,7 @@ export default async function handler(req, res) {
       <p>Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.</p>
     </div>
     <div class="footer">
-      Diese E-Mail wurde automatisch von FahrenLeicht gesendet.
+      Diese E-Mail wurde automatisch von Sorna gesendet.
     </div>
   </div>
 </div>
@@ -146,7 +145,7 @@ export default async function handler(req, res) {
 </html>`.trim();
 
     const text = [
-      "FahrenLeicht – Passwort zurücksetzen",
+      "Sorna – Passwort zurücksetzen",
       "",
       "Du hast eine Zurücksetzung deines Passworts angefordert.",
       "Öffne den folgenden Link in deinem Browser, um ein neues Passwort zu setzen:",
@@ -158,7 +157,7 @@ export default async function handler(req, res) {
     const info = await transporter.sendMail({
       from: `${FROM_NAME} <${FROM_EMAIL}>`,
       to: email,
-      subject: "🔐 Passwort zurücksetzen – FahrenLeicht",
+      subject: "🔐 Passwort zurücksetzen – Sorna",
       text,
       html,
     });
