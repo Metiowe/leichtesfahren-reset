@@ -24,7 +24,7 @@ function scorePassword(pw) {
 
 export default function ResetPage() {
   const router = useRouter();
-  const { userId, token } = router.query; // ⬅️ Wichtig: token statt secret
+  const { userId, token } = router.query;
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -33,7 +33,6 @@ export default function ResetPage() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
 
-  // nur clientseitig Bubbles generieren (Hydration safe)
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -73,13 +72,11 @@ export default function ResetPage() {
         text: "✅ Passwort erfolgreich geändert. Du kannst dich jetzt in der App anmelden.",
       });
 
-      // kleiner Komfort: Flag setzen, damit deine App-Startseite einen Hinweis zeigen kann
       if (typeof window !== "undefined") {
         window.localStorage.setItem("passwordResetSuccess", "true");
       }
 
       setTimeout(() => {
-        // zurück zur kleinen Home-Seite deines Reset-Projekts
         router.replace("/");
       }, 1500);
     } catch (e) {
@@ -94,17 +91,16 @@ export default function ResetPage() {
     }
   }
 
-  // 🌊 Vollflächige Wasserblasen (gleich wie Home)
   const bubbles = useMemo(() => {
     if (!mounted) return null;
     const total = 24;
     return Array.from({ length: total }).map((_, i) => {
-      const size = 6 + Math.random() * 16; // vmin
-      const left = Math.random() * 100; // vw
-      const top = Math.random() * 100; // vh
-      const dur = 20 + Math.random() * 20; // s
-      const delay = Math.random() * 20; // s
-      const sway = 6 + Math.random() * 8; // s
+      const size = 6 + Math.random() * 16;
+      const left = Math.random() * 100;
+      const top = Math.random() * 100;
+      const dur = 20 + Math.random() * 20;
+      const delay = Math.random() * 20;
+      const sway = 6 + Math.random() * 8;
       const scale = 0.7 + Math.random() * 0.7;
       return (
         <span
@@ -115,7 +111,6 @@ export default function ResetPage() {
             top: `${top}vh`,
             width: `${size}vmin`,
             height: `${size}vmin`,
-            // @ts-ignore – CSS custom props
             "--dur": `${dur}s`,
             "--delay": `${delay}s`,
             "--sway": `${sway}s`,
@@ -131,14 +126,12 @@ export default function ResetPage() {
   return (
     <>
       <Head>
-        <title>FahrenLeicht – Passwort zurücksetzen</title>
+        <title>Sorna – Passwort zurücksetzen</title>
         <meta name="theme-color" content="#0ea5e9" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      {/* Seite */}
       <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-black flex flex-col">
-        {/* 🌊 Vollflächige Bubbles unter allem */}
         <div
           className="bubbles pointer-events-none fixed inset-0"
           aria-hidden="true"
@@ -146,21 +139,21 @@ export default function ResetPage() {
           {bubbles}
         </div>
 
-        {/* 🔝 Brand-Header – gleiche Breite wie Karte */}
         <header className="z-10 w-full px-4 pt-8 md:pt-12 flex justify-center">
           <div className="glass w-full max-w-md rounded-2xl border border-white/10 shadow-lg px-5 py-4 flex flex-col items-center gap-3">
-            <div className="h-16 w-16 flex items-center justify-center rounded-full bg-white/10 border border-white/10 shadow-md">
+            {/* 🚀 ICON WRAPPER VERGRÖSSERT */}
+            <div className="h-20 w-20 flex items-center justify-center rounded-full bg-white/10 border border-white/10 shadow-md overflow-hidden">
               <Image
                 src="/icon.png"
-                alt="FahrenLeicht Icon"
-                width={48}
-                height={48}
-                className="rounded-full object-cover"
+                alt="Sorna Icon"
+                width={80} // Höhere Auflösung für schärferes Icon
+                height={80}
+                className="rounded-full object-cover" // object-cover füllt den Kreis aus
                 priority
               />
             </div>
             <h1 className="text-[26px] md:text-[30px] font-extrabold text-white tracking-tight">
-              FahrenLeicht
+              Sorna
             </h1>
             <p className="text-slate-300/85 text-sm md:text-[15px] text-center">
               Bitte gib dein neues Passwort ein.
@@ -168,7 +161,6 @@ export default function ResetPage() {
           </div>
         </header>
 
-        {/* 🧊 Karte */}
         <section className="z-10 w-full flex-1 px-4 pb-10 mt-6 md:mt-8 flex justify-center">
           <div className="glass w-full max-w-md rounded-3xl border border-white/10 shadow-2xl p-5 md:p-6">
             <h2 className="text-white/95 text-lg md:text-xl font-extrabold mb-4">
@@ -182,8 +174,7 @@ export default function ResetPage() {
               </div>
             ) : (
               <>
-                {/* Neues Passwort */}
-                <label className="block text-sm font-semibold mb-1">
+                <label className="block text-sm font-semibold mb-1 text-white">
                   Neues Passwort
                 </label>
                 <div className="relative mb-3">
@@ -198,16 +189,12 @@ export default function ResetPage() {
                   <span
                     onClick={() => setShow1((p) => !p)}
                     className="material-icons absolute right-3 top-3.5 cursor-pointer text-slate-300/80 hover:text-white select-none"
-                    aria-label={
-                      show1 ? "Passwort verbergen" : "Passwort anzeigen"
-                    }
-                    role="button"
+                    style={{ fontSize: "20px" }}
                   >
                     {show1 ? "visibility_off" : "visibility"}
                   </span>
                 </div>
 
-                {/* Stärke */}
                 <div className="mb-4">
                   <div className="meter">
                     <span style={{ width: `${Math.max(6, score)}%` }} />
@@ -231,8 +218,7 @@ export default function ResetPage() {
                   </ul>
                 </div>
 
-                {/* Bestätigen */}
-                <label className="block text-sm font-semibold mb-1">
+                <label className="block text-sm font-semibold mb-1 text-white">
                   Passwort bestätigen
                 </label>
                 <div className="relative mb-3">
@@ -246,16 +232,12 @@ export default function ResetPage() {
                   <span
                     onClick={() => setShow2((p) => !p)}
                     className="material-icons absolute right-3 top-3.5 cursor-pointer text-slate-300/80 hover:text-white select-none"
-                    aria-label={
-                      show2 ? "Bestätigung verbergen" : "Bestätigung anzeigen"
-                    }
-                    role="button"
+                    style={{ fontSize: "20px" }}
                   >
                     {show2 ? "visibility_off" : "visibility"}
                   </span>
                 </div>
 
-                {/* Nachricht */}
                 {msg && (
                   <div
                     className={`mb-3 rounded-xl border p-3 text-sm ${
@@ -268,7 +250,6 @@ export default function ResetPage() {
                   </div>
                 )}
 
-                {/* Submit */}
                 <button
                   onClick={handleReset}
                   disabled={!canSubmit || busy}
@@ -284,10 +265,10 @@ export default function ResetPage() {
                 <p className="text-center text-[11px] text-slate-400 mt-4">
                   Probleme?{" "}
                   <a
-                    href="mailto:support@fahrenleicht.app"
+                    href="mailto:support@sorna.app"
                     className="underline decoration-dotted hover:text-slate-200"
                   >
-                    support@fahrenleicht.app
+                    support@sorna.app
                   </a>
                 </p>
               </>

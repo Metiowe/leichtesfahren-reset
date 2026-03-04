@@ -1,8 +1,7 @@
 // lib/api-backend.ts
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "https://mini-auth-backend.onrender.com";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.leichtesfahren.pro";
 
 function buildUrl(path: string) {
   return `${API_BASE_URL.replace(/\/$/, "")}${path}`;
