@@ -89,7 +89,7 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-[26px] md:text-[30px] font-extrabold text-white tracking-tight">
-            Sorna
+            FahrenLeicht
           </h1>
 
           <p className="text-slate-300/85 text-sm md:text-[15px] text-center">
@@ -108,7 +108,7 @@ export default function HomePage() {
           className="glass w-full max-w-md rounded-3xl border border-white/10 shadow-2xl p-5 md:p-6"
         >
           <h2 className="text-white/95 text-lg md:text-xl font-extrabold mb-2">
-            Willkommen bei Sorna
+            Willkommen bei FahrenLeicht
           </h2>
           <p className="text-slate-300/85 text-sm md:text-[15px] mb-5">
             Diese Seite wird nur für das Zurücksetzen deines Passworts
@@ -129,7 +129,7 @@ export default function HomePage() {
                          text-white transition flex items-center justify-center gap-2"
             >
               <FaExternalLinkAlt className="opacity-90" />
-              Sorna-Webseite besuchen
+              FahrenLeicht-Webseite besuchen
             </button>
           </a>
 
@@ -159,7 +159,7 @@ export default function HomePage() {
 
       {/* 🔻 Footer */}
       <footer className="z-10 w-full text-center text-[12.5px] text-slate-400/85 py-5">
-        © {new Date().getFullYear()} Sorna — Alle Rechte vorbehalten
+        © {new Date().getFullYear()} FahrenLeicht — Alle Rechte vorbehalten
       </footer>
     </div>
   );

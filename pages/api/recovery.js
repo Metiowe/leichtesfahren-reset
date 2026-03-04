@@ -10,7 +10,7 @@ import nodemailer from "nodemailer";
  * - HIER wird die E-Mail mit dem Reset-Link verschickt
  */
 
-const FROM_NAME = process.env.SMTP_FROM_NAME || "Sorna Support";
+const FROM_NAME = process.env.SMTP_FROM_NAME || "FahrenLeicht Support";
 // ⚠️ Fallback = deine verifizierte Brevo-Adresse (wie beim OTP!)
 const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || "starowen66@gmail.com";
 
@@ -78,13 +78,13 @@ export default async function handler(req, res) {
     });
 
     const preheader =
-      "Hier kannst du dein Passwort für Sorna sicher zurücksetzen.";
+      "Hier kannst du dein Passwort für FahrenLeicht sicher zurücksetzen.";
     const html = `
 <!doctype html>
 <html lang="de">
 <head>
 <meta charset="utf-8" />
-<title>Passwort zurücksetzen – Sorna</title>
+<title>Passwort zurücksetzen – FahrenLeicht</title>
 <meta name="color-scheme" content="light dark">
 <style>
   body { margin:0; padding:0; background:#0b1220; }
@@ -121,7 +121,7 @@ export default async function handler(req, res) {
 <span style="display:none!important">${preheader}</span>
 <div class="bg">
   <div class="card">
-    <div class="header">Sorna – Passwort zurücksetzen</div>
+    <div class="header">FahrenLeicht – Passwort zurücksetzen</div>
     <div class="content">
       <p>Hallo,</p>
       <p>du hast eine Zurücksetzung deines Passworts angefordert. Klicke auf den folgenden Button, um ein neues Passwort zu vergeben:</p>
@@ -137,7 +137,7 @@ export default async function handler(req, res) {
       <p>Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.</p>
     </div>
     <div class="footer">
-      Diese E-Mail wurde automatisch von Sorna gesendet.
+      Diese E-Mail wurde automatisch von FahrenLeicht gesendet.
     </div>
   </div>
 </div>
@@ -145,7 +145,7 @@ export default async function handler(req, res) {
 </html>`.trim();
 
     const text = [
-      "Sorna – Passwort zurücksetzen",
+      "FahrenLeicht – Passwort zurücksetzen",
       "",
       "Du hast eine Zurücksetzung deines Passworts angefordert.",
       "Öffne den folgenden Link in deinem Browser, um ein neues Passwort zu setzen:",
@@ -157,7 +157,7 @@ export default async function handler(req, res) {
     const info = await transporter.sendMail({
       from: `${FROM_NAME} <${FROM_EMAIL}>`,
       to: email,
-      subject: "🔐 Passwort zurücksetzen – Sorna",
+      subject: "🔐 Passwort zurücksetzen – FahrenLeicht",
       text,
       html,
     });
