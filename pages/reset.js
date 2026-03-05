@@ -24,7 +24,9 @@ function scorePassword(pw) {
 
 export default function ResetPage() {
   const router = useRouter();
-  const { userId, token } = router.query; // ⬅️ Wichtig: token statt secret
+
+  // 🚀 SICHERHEITS-UPDATE: Wir fragen nur noch den "token" aus der URL ab, KEINE userId mehr!
+  const { token } = router.query;
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -39,11 +41,13 @@ export default function ResetPage() {
 
   const { rules, score } = useMemo(() => scorePassword(password), [password]);
 
+  // 🚀 PRÜFUNG: Es muss nur noch der Token da sein, um das Formular freizugeben
   const canSubmit =
-    !!userId && !!token && password.length >= MIN_LEN && confirm === password;
+    !!token && password.length >= MIN_LEN && confirm === password;
 
   async function handleReset() {
-    if (!userId || !token) {
+    // 🚀 Checkt nur noch auf den Token
+    if (!token) {
       setMsg({ ok: false, text: "❌ Der Link ist ungültig oder abgelaufen." });
       return;
     }
@@ -62,8 +66,8 @@ export default function ResetPage() {
     setBusy(true);
     setMsg(null);
     try {
+      // 🚀 SICHERHEITS-UPDATE: Wir senden nur noch den Token ans Backend!
       await resetPasswordBackend({
-        userId: String(userId),
         token: String(token),
         newPassword: password,
       });
@@ -126,7 +130,8 @@ export default function ResetPage() {
     });
   }, [mounted]);
 
-  const hasToken = !!userId && !!token;
+  // 🚀 PRÜFUNG FÜR UI: Nur Token wird gecheckt
+  const hasToken = !!token;
 
   return (
     <>
@@ -183,7 +188,7 @@ export default function ResetPage() {
             ) : (
               <>
                 {/* Neues Passwort */}
-                <label className="block text-sm font-semibold mb-1">
+                <label className="block text-sm font-semibold mb-1 text-white">
                   Neues Passwort
                 </label>
                 <div className="relative mb-3">
@@ -232,7 +237,7 @@ export default function ResetPage() {
                 </div>
 
                 {/* Bestätigen */}
-                <label className="block text-sm font-semibold mb-1">
+                <label className="block text-sm font-semibold mb-1 text-white">
                   Passwort bestätigen
                 </label>
                 <div className="relative mb-3">
