@@ -34,8 +34,8 @@ export default async function handler(req, res) {
 
   try {
     const backendBase =
-      process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.leichtesfahren.pro";
-
+      // process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.leichtesfahren.pro";
+      process.env.NEXT_PUBLIC_API_BASE_URL || "https://87-106-200-105.nip.io";
     // 1️⃣ Backend: Token + Reset-URL holen
     const resp = await fetch(
       `${backendBase.replace(/\/$/, "")}/auth/reset-password-request`,

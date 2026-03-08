@@ -1,7 +1,8 @@
 // lib/api-backend.ts
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.leichtesfahren.pro";
+  // process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.leichtesfahren.pro";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://87-106-200-105.nip.io";
 
 function buildUrl(path: string) {
   return `${API_BASE_URL.replace(/\/$/, "")}${path}`;
