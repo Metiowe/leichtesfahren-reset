@@ -30,10 +30,16 @@ export default async function handler(req, res) {
   try {
     // 3. Hier leiten wir die E-Mail an deinen Python-Server auf IONOS weiter!
     // Falls du die URL in .env stehen hast, nimmt er die, sonst den harten Fallback
-    const API_BASE =
+    let API_BASE =
       process.env.NEXT_PUBLIC_API_BASE_URL || "https://87-106-200-105.nip.io";
 
-    // 🔥 WICHTIG (DER FIX!): Der Slash '/' am Ende ist zwingend nötig,
+    // 🚀 DER LEBENSRETTENDE FIX: Wir zwingen Vercel zu HTTPS!
+    // (Verhindert den automatischen Redirect, der aus POST einen GET-Befehl macht)
+    if (API_BASE.startsWith("http://")) {
+      API_BASE = API_BASE.replace("http://", "https://");
+    }
+
+    // 🔥 WICHTIG: Der Slash '/' am Ende ist zwingend nötig,
     // damit FastAPI (Python) keinen 405 Redirect-Fehler wirft!
     const pythonEndpoint = `${API_BASE}/auth/reset-password-request/`;
 
