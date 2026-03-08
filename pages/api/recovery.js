@@ -33,9 +33,9 @@ export default async function handler(req, res) {
     const API_BASE =
       process.env.NEXT_PUBLIC_API_BASE_URL || "https://87-106-200-105.nip.io";
 
-    // 🔥 WICHTIG: Pass diesen Pfad an, falls dein Python-Endpunkt anders heißt!
-    // Auf deinem Screenshot sah es aus wie /auth/res...
-    const pythonEndpoint = `${API_BASE}/auth/reset-password-request`;
+    // 🔥 WICHTIG (DER FIX!): Der Slash '/' am Ende ist zwingend nötig,
+    // damit FastAPI (Python) keinen 405 Redirect-Fehler wirft!
+    const pythonEndpoint = `${API_BASE}/auth/reset-password-request/`;
 
     console.log(
       `🚀 Sende Reset-Befehl für ${email} an dein Python-Backend: ${pythonEndpoint}`,
