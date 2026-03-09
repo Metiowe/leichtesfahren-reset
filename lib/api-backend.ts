@@ -1,14 +1,15 @@
 // lib/api-backend.ts
 
-// 🚀 FIX 1: Wir scheißen auf Vercel ENV Variablen und zwingen ihn HART auf HTTPS!
-const API_BASE_URL = "https://87-106-200-105.nip.io";
+const API_BASE_URL =
+  // process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.leichtesfahren.pro";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://87-106-200-105.nip.io";
 
 function buildUrl(path: string) {
   return `${API_BASE_URL.replace(/\/$/, "")}${path}`;
 }
 
-// 🚀 FIX 2: userId WURDE GELÖSCHT! Python erwartet nur noch token & newPassword!
 export async function resetPasswordBackend(params: {
+  userId: string;
   token: string;
   newPassword: string;
 }) {
@@ -16,6 +17,7 @@ export async function resetPasswordBackend(params: {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
+      userId: params.userId,
       token: params.token,
       newPassword: params.newPassword,
     }),
