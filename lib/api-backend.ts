@@ -1,15 +1,13 @@
 // lib/api-backend.ts
 
-const API_BASE_URL =
-  // process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.leichtesfahren.pro";
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://87-106-200-105.nip.io";
+// Wenn das Backend HTTP nutzt, bleib hier bei HTTP! (nip.io hat standardmäßig kein HTTPS Zertifikat)
+const API_BASE_URL = "http://87-106-200-105.nip.io";
 
 function buildUrl(path: string) {
   return `${API_BASE_URL.replace(/\/$/, "")}${path}`;
 }
 
 export async function resetPasswordBackend(params: {
-  userId: string;
   token: string;
   newPassword: string;
 }) {
@@ -17,7 +15,6 @@ export async function resetPasswordBackend(params: {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      userId: params.userId,
       token: params.token,
       newPassword: params.newPassword,
     }),
