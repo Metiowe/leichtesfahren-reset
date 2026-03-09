@@ -2,19 +2,9 @@
 
 import nodemailer from "nodemailer";
 
-/**
- * Diese API:
- * - bekommt die E-Mail aus der App
- * - ruft dein Python-Backend /auth/reset-password-request auf
- * - Backend erzeugt Token + Reset-URL und gibt sie zurück
- * - HIER wird die E-Mail mit dem Reset-Link verschickt
- */
-
 const FROM_NAME = process.env.SMTP_FROM_NAME || "FahrenLeicht Support";
-// ⚠️ Fallback = deine verifizierte Brevo-Adresse (wie beim OTP!)
 const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || "mehdiowen44@gmail.com";
 
-// Brevo / SMTP Config – gleich wie bei deinem OTP-Service
 const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com";
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587", 10);
 const SMTP_USER = process.env.SMTP_USER;
@@ -33,48 +23,52 @@ export default async function handler(req, res) {
   }
 
   try {
-    const backendBase =
-      // process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.leichtesfahren.pro";
+    // 🚀 DER LEBENSRETTENDE FIX: Wir zwingen Vercel zu HTTPS, egal was in der .env steht!
+    let backendBase =
       process.env.NEXT_PUBLIC_API_BASE_URL || "https://87-106-200-105.nip.io";
+    backendBase = backendBase.replace("http://", "https://").replace(/\/$/, "");
+
+    const pythonEndpoint = `${backendBase}/auth/reset-password-request`;
+    console.log(`🚀 Sende POST an Python: ${pythonEndpoint}`);
+
     // 1️⃣ Backend: Token + Reset-URL holen
-    const resp = await fetch(
-      `${backendBase.replace(/\/$/, "")}/auth/reset-password-request`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      },
-    );
+    const resp = await fetch(pythonEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
 
     const data = await resp.json().catch(() => ({}));
+
     if (!resp.ok) {
-      console.error("reset-request failed", resp.status, data);
-      // absichtlich generische Antwort – keine Infos leaken
-      return res.status(200).json({ ok: true });
+      console.error("❌ Python-Backend Fehler:", resp.status, data);
+      return res
+        .status(resp.status)
+        .json({ error: data.detail || "Fehler vom Python-Backend" });
     }
 
     const resetUrl = data.resetUrl;
     if (!resetUrl) {
-      console.log("no resetUrl returned (user may not exist)");
-      // Auch hier: immer ok, damit niemand E-Mails abfragen kann
+      console.log("⚠️ Keine resetUrl vom Backend. User existiert nicht.");
       return res.status(200).json({ ok: true });
     }
 
     // 2️⃣ SMTP Transporter
     if (!SMTP_USER || !SMTP_PASS) {
-      console.error("❌ Missing SMTP_USER / SMTP_PASS env");
-      return res.status(500).json({ error: "SMTP not configured" });
+      console.error("❌ FEHLER: SMTP_USER oder SMTP_PASS fehlen in Vercel!");
+      return res.status(500).json({ error: "SMTP Zugangsdaten fehlen." });
     }
 
     const transporter = nodemailer.createTransport({
       host: SMTP_HOST,
       port: SMTP_PORT,
-      secure: false,
+      secure: SMTP_PORT === 465,
       auth: { user: SMTP_USER, pass: SMTP_PASS },
     });
 
     await transporter.verify().catch((e) => {
-      console.warn("SMTP verify failed (continue anyway):", e?.message || e);
+      console.error("❌ SMTP Login blockiert:", e?.message || e);
+      throw new Error("E-Mail Login gescheitert. Falsches App-Passwort?");
     });
 
     const preheader =
@@ -155,17 +149,17 @@ export default async function handler(req, res) {
     ].join("\n");
 
     const info = await transporter.sendMail({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: email,
       subject: "🔐 Passwort zurücksetzen – FahrenLeicht",
       text,
       html,
     });
 
-    console.log("✅ reset mail sent", info.messageId || info);
+    console.log("✅ E-Mail erfolgreich gesendet! Message-ID:", info.messageId);
     return res.status(200).json({ ok: true });
   } catch (e) {
-    console.error("recovery api error", e);
-    return res.status(500).json({ error: "Failed" });
+    console.error("❌ API Error:", e);
+    return res.status(500).json({ error: e.message || "Server-Fehler" });
   }
 }
