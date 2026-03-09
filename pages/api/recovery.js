@@ -1,80 +1,171 @@
-// ===== pages/api/recovery.js =====
-// Nimmt den Befehl aus der React Native App an und schickt ihn an dein Python-Backend!
+// pages/api/recovery.js
+
+import nodemailer from "nodemailer";
+
+/**
+ * Diese API:
+ * - bekommt die E-Mail aus der App
+ * - ruft dein Python-Backend /auth/reset-password-request auf
+ * - Backend erzeugt Token + Reset-URL und gibt sie zurück
+ * - HIER wird die E-Mail mit dem Reset-Link verschickt
+ */
+
+const FROM_NAME = process.env.SMTP_FROM_NAME || "FahrenLeicht Support";
+// ⚠️ Fallback = deine verifizierte Brevo-Adresse (wie beim OTP!)
+const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || "mehdiowen44@gmail.com";
+
+// Brevo / SMTP Config – gleich wie bei deinem OTP-Service
+const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com";
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587", 10);
+const SMTP_USER = process.env.SMTP_USER;
+const SMTP_PASS = process.env.SMTP_PASS;
 
 export default async function handler(req, res) {
-  // 1. CORS-Schutz: Erlaubt deiner Handy-App, mit Vercel zu reden
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  // Preflight-Check für Apps abfangen
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  // 2. Türsteher: Wir erlauben NUR POST-Anfragen (Kein GET)
+  if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") {
-    console.error(`Falsche Methode: ${req.method} statt POST`);
-    return res
-      .status(405)
-      .json({ error: "Method Not Allowed - Nur POST erlaubt" });
+    res.setHeader("Allow", ["POST", "OPTIONS"]);
+    return res.status(405).json({ error: "Only POST allowed" });
   }
 
-  // E-Mail aus der App auslesen
-  const { email } = req.body;
-  if (!email) {
-    console.error("Fehler: Keine E-Mail im Request-Body gefunden!");
-    return res.status(400).json({ error: "E-Mail fehlt" });
+  const { email } = req.body || {};
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: "Invalid email" });
   }
 
   try {
-    // 3. Hier leiten wir die E-Mail an deinen Python-Server auf IONOS weiter!
-    // Falls du die URL in .env stehen hast, nimmt er die, sonst den harten Fallback
-    let API_BASE =
+    const backendBase =
+      // process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.leichtesfahren.pro";
       process.env.NEXT_PUBLIC_API_BASE_URL || "https://87-106-200-105.nip.io";
-
-    // 🚀 DER LEBENSRETTENDE FIX: Wir zwingen Vercel zu HTTPS!
-    // (Verhindert den automatischen Redirect, der aus POST einen GET-Befehl macht)
-    if (API_BASE.startsWith("http://")) {
-      API_BASE = API_BASE.replace("http://", "https://");
-    }
-
-    // 🔥 WICHTIG: Der Slash '/' am Ende ist zwingend nötig,
-    // damit FastAPI (Python) keinen 405 Redirect-Fehler wirft!
-    const pythonEndpoint = `${API_BASE}/auth/reset-password-request/`;
-
-    console.log(
-      `🚀 Sende Reset-Befehl für ${email} an dein Python-Backend: ${pythonEndpoint}`,
+    // 1️⃣ Backend: Token + Reset-URL holen
+    const resp = await fetch(
+      `${backendBase.replace(/\/$/, "")}/auth/reset-password-request`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      },
     );
 
-    // Wir schießen den POST-Request an Python ab
-    const backendRes = await fetch(pythonEndpoint, {
-      method: "POST", // 🚨 DAS MUSS POST SEIN!
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    // 4. Hat Python gemeckert? (Dein 405 Fehler von vorhin!)
-    if (!backendRes.ok) {
-      const errText = await backendRes.text();
-      console.error(
-        `🚨 Python-Backend hat Fehler geworfen (HTTP ${backendRes.status}):`,
-        errText,
-      );
-
-      // Hacker-Schutz: Wir loggen den Fehler zwar für dich,
-      // aber der App sagen wir "Alles OK", damit Hacker keine E-Mails raten können.
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+      console.error("reset-request failed", resp.status, data);
+      // absichtlich generische Antwort – keine Infos leaken
       return res.status(200).json({ ok: true });
     }
 
-    // 5. Alles lief glatt! Python hat die Mail erfolgreich versendet!
-    console.log("✅ Python-Backend hat die Mail erfolgreich versendet!");
+    const resetUrl = data.resetUrl;
+    if (!resetUrl) {
+      console.log("no resetUrl returned (user may not exist)");
+      // Auch hier: immer ok, damit niemand E-Mails abfragen kann
+      return res.status(200).json({ ok: true });
+    }
+
+    // 2️⃣ SMTP Transporter
+    if (!SMTP_USER || !SMTP_PASS) {
+      console.error("❌ Missing SMTP_USER / SMTP_PASS env");
+      return res.status(500).json({ error: "SMTP not configured" });
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: false,
+      auth: { user: SMTP_USER, pass: SMTP_PASS },
+    });
+
+    await transporter.verify().catch((e) => {
+      console.warn("SMTP verify failed (continue anyway):", e?.message || e);
+    });
+
+    const preheader =
+      "Hier kannst du dein Passwort für FahrenLeicht sicher zurücksetzen.";
+    const html = `
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Passwort zurücksetzen – FahrenLeicht</title>
+<meta name="color-scheme" content="light dark">
+<style>
+  body { margin:0; padding:0; background:#0b1220; }
+  .bg { background:#0b1220; padding:24px; }
+  .card {
+    max-width:520px; margin:0 auto; background:#0f172a;
+    border-radius:16px; overflow:hidden; color:#e5e7eb;
+    font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Inter,Arial,sans-serif;
+  }
+  .header {
+    padding:18px 22px; border-bottom:1px solid rgba(255,255,255,0.06);
+    font-size:16px; font-weight:600;
+  }
+  .content { padding:22px; font-size:14px; line-height:1.6; }
+  .btn-wrap { margin:18px 0 10px; text-align:center; }
+  .btn {
+    display:inline-block; padding:11px 18px; border-radius:999px;
+    background:#0ea5e9; color:#fff !important; text-decoration:none;
+    font-size:14px; font-weight:600;
+  }
+  .link { word-break:break-all; font-size:12px; color:#9ca3af; margin-top:10px; }
+  .footer {
+    padding:14px 22px; font-size:12px; color:#9ca3af;
+    border-top:1px solid rgba(255,255,255,0.06); text-align:center;
+  }
+  @media (prefers-color-scheme: light) {
+    body, .bg { background:#f4f6fb; }
+    .card { background:#ffffff; color:#111827; }
+    .header, .footer { border-color:#e5e7eb; }
+  }
+</style>
+</head>
+<body>
+<span style="display:none!important">${preheader}</span>
+<div class="bg">
+  <div class="card">
+    <div class="header">FahrenLeicht – Passwort zurücksetzen</div>
+    <div class="content">
+      <p>Hallo,</p>
+      <p>du hast eine Zurücksetzung deines Passworts angefordert. Klicke auf den folgenden Button, um ein neues Passwort zu vergeben:</p>
+      <div class="btn-wrap">
+        <a class="btn" href="${resetUrl}" target="_blank" rel="noreferrer">
+          Passwort jetzt zurücksetzen
+        </a>
+      </div>
+      <p class="link">
+        Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br/>
+        ${resetUrl}
+      </p>
+      <p>Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.</p>
+    </div>
+    <div class="footer">
+      Diese E-Mail wurde automatisch von FahrenLeicht gesendet.
+    </div>
+  </div>
+</div>
+</body>
+</html>`.trim();
+
+    const text = [
+      "FahrenLeicht – Passwort zurücksetzen",
+      "",
+      "Du hast eine Zurücksetzung deines Passworts angefordert.",
+      "Öffne den folgenden Link in deinem Browser, um ein neues Passwort zu setzen:",
+      resetUrl,
+      "",
+      "Wenn du das nicht warst, kannst du diese E-Mail ignorieren.",
+    ].join("\n");
+
+    const info = await transporter.sendMail({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to: email,
+      subject: "🔐 Passwort zurücksetzen – FahrenLeicht",
+      text,
+      html,
+    });
+
+    console.log("✅ reset mail sent", info.messageId || info);
     return res.status(200).json({ ok: true });
-  } catch (error) {
-    console.error("🚨 Vercel-Server ist intern abgestürzt:", error);
-    // Auch bei Absturz: App "ok" vorgaukeln (Security Best Practice)
-    return res.status(200).json({ ok: true });
+  } catch (e) {
+    console.error("recovery api error", e);
+    return res.status(500).json({ error: "Failed" });
   }
 }
