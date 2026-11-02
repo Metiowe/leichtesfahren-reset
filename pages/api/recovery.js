@@ -3,8 +3,14 @@
 import nodemailer from "nodemailer";
 
 const FROM_NAME = process.env.SMTP_FROM_NAME || "FahrenLeicht Support";
-const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || "mehdiowen44@gmail.com";
+// Wir greifen auf deine Vercel-Variable zu, ansonsten Fallback auf die verifizierte Domain
+const FROM_EMAIL =
+  process.env.SMTP_FROM_EMAIL ||
+  process.env.SMTP_FROM ||
+  "no-reply@leichtesfahren.pro";
 
+// 🚨 HIER WAR DER FEHLER: Wir müssen Brevo nutzen, nicht Gmail!
+// Gmail SMTP für Passwort-Reset
 const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com";
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587", 10);
 const SMTP_USER = process.env.SMTP_USER;
@@ -62,13 +68,15 @@ export default async function handler(req, res) {
     const transporter = nodemailer.createTransport({
       host: SMTP_HOST,
       port: SMTP_PORT,
-      secure: SMTP_PORT === 465,
+      secure: false, // Für Port 587 muss secure 'false' sein (STARTTLS)
       auth: { user: SMTP_USER, pass: SMTP_PASS },
     });
 
     await transporter.verify().catch((e) => {
       console.error("❌ SMTP Login blockiert:", e?.message || e);
-      throw new Error("E-Mail Login gescheitert. Falsches App-Passwort?");
+      throw new Error(
+        "E-Mail Login gescheitert. Bitte prüfe SMTP_USER und SMTP_PASS.",
+      );
     });
 
     const preheader =
