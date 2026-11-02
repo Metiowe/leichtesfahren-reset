@@ -1,3 +1,5 @@
+// ===== pages/index.js =====
+
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -5,31 +7,47 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { FaApple, FaGooglePlay, FaExternalLinkAlt } from "react-icons/fa";
 
+const SUCCESS_REDIRECT_URL =
+  "https://leichtesfahrenotp.vercel.app?passwordReset=success";
+
 export default function HomePage() {
   const [showResetNotice, setShowResetNotice] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const success = localStorage.getItem("passwordResetSuccess");
-    if (success === "true") {
-      setShowResetNotice(true);
-      localStorage.removeItem("passwordResetSuccess");
+
+    try {
+      const success = localStorage.getItem("passwordResetSuccess");
+
+      if (success === "true") {
+        // Hinweis setzen, falls die Weiterleitung nicht sofort funktioniert
+        setShowResetNotice(true);
+
+        // Flag entfernen, damit keine Weiterleitungsschleife entsteht
+        localStorage.removeItem("passwordResetSuccess");
+
+        // Nach erfolgreichem Passwort-Reset automatisch weiterleiten
+        window.location.replace(SUCCESS_REDIRECT_URL);
+      }
+    } catch (error) {
+      console.error("Fehler beim Prüfen des Passwort-Reset-Status:", error);
     }
   }, []);
 
-  // 🌊 Bubbles – jetzt überall, mit leichtem Glow & float + rise kombiniert
+  // 🌊 Bubbles – überall mit leichtem Glow, Float und Rise
   const bubbles = useMemo(() => {
     if (!mounted) return null;
 
     const total = 24;
+
     return Array.from({ length: total }).map((_, i) => {
-      const size = 6 + Math.random() * 16; // vmin
-      const left = Math.random() * 100; // vw
-      const top = Math.random() * 100; // vh
-      const dur = 20 + Math.random() * 20; // s
-      const delay = Math.random() * 20; // s
-      const sway = 6 + Math.random() * 8; // s
+      const size = 6 + Math.random() * 16;
+      const left = Math.random() * 100;
+      const top = Math.random() * 100;
+      const dur = 20 + Math.random() * 20;
+      const delay = Math.random() * 20;
+      const sway = 6 + Math.random() * 8;
       const scale = 0.7 + Math.random() * 0.7;
 
       return (
@@ -64,7 +82,7 @@ export default function HomePage() {
       {/* ✅ Grüner Hinweis */}
       {showResetNotice && (
         <div className="z-20 bg-emerald-500/90 text-white text-center py-3 px-4 font-semibold backdrop-blur border-b border-white/10">
-          Passwort aktualisiert – du kannst dich jetzt in der App anmelden.
+          Passwort aktualisiert – Weiterleitung zu FahrenLeicht …
         </div>
       )}
 
@@ -110,6 +128,7 @@ export default function HomePage() {
           <h2 className="text-white/95 text-lg md:text-xl font-extrabold mb-2">
             Willkommen bei FahrenLeicht
           </h2>
+
           <p className="text-slate-300/85 text-sm md:text-[15px] mb-5">
             Diese Seite wird nur für das Zurücksetzen deines Passworts
             verwendet. Besuche unsere Hauptseite, um mehr über unsere App zu
@@ -123,14 +142,14 @@ export default function HomePage() {
             rel="noreferrer"
             className="block"
           >
-            <button
+            <span
               className="w-full rounded-2xl py-3 font-extrabold tracking-wide
                          bg-gradient-to-r from-sky-500 to-indigo-600 hover:brightness-110
                          text-white transition flex items-center justify-center gap-2"
             >
               <FaExternalLinkAlt className="opacity-90" />
               FahrenLeicht-Webseite besuchen
-            </button>
+            </span>
           </a>
 
           {/* App Store Links */}
@@ -144,6 +163,7 @@ export default function HomePage() {
               <FaGooglePlay />
               <span className="font-semibold">Google Play</span>
             </a>
+
             <a
               href="https://apps.apple.com/app/leichtesfahren"
               target="_blank"
