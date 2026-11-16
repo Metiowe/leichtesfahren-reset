@@ -1,7 +1,7 @@
 // lib/api-backend.ts
 
 // 🚀 DER LETZTE FIX: Wir zwingen auch hier HTTPS, sonst blockiert der Browser (Mixed Content)!
-const API_BASE_URL = "https://87-106-200-105.nip.io";
+const API_BASE_URL = "https://deutschleicht.duckdns.org";
 
 function buildUrl(path: string) {
   return `${API_BASE_URL.replace(/\/$/, "")}${path}`;

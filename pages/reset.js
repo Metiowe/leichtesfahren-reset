@@ -77,14 +77,10 @@ export default function ResetPage() {
         text: "✅ Passwort erfolgreich geändert. Du kannst dich jetzt in der App anmelden.",
       });
 
-      // kleiner Komfort: Flag setzen, damit deine App-Startseite einen Hinweis zeigen kann
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("passwordResetSuccess", "true");
-      }
-
       setTimeout(() => {
-        // zurück zur kleinen Home-Seite deines Reset-Projekts
-        router.replace("/");
+        window.location.replace(
+          "https://leichtesfahrenotp.vercel.app?passwordReset=success"
+        );
       }, 1500);
     } catch (e) {
       const t =
