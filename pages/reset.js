@@ -136,7 +136,7 @@ export default function ResetPage() {
   return (
     <>
       <Head>
-        <title>FahrenLeicht – Passwort zurücksetzen</title>
+        <title>DeutschLeicht – Passwort zurücksetzen</title>
         <meta name="theme-color" content="#0ea5e9" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -157,7 +157,7 @@ export default function ResetPage() {
             <div className="h-16 w-16 flex items-center justify-center rounded-full bg-white/10 border border-white/10 shadow-md">
               <Image
                 src="/icon.png"
-                alt="FahrenLeicht Icon"
+                alt="DeutschLeicht Icon"
                 width={48}
                 height={48}
                 className="rounded-full object-cover"
@@ -165,7 +165,7 @@ export default function ResetPage() {
               />
             </div>
             <h1 className="text-[26px] md:text-[30px] font-extrabold text-white tracking-tight">
-              FahrenLeicht
+              DeutschLeicht
             </h1>
             <p className="text-slate-300/85 text-sm md:text-[15px] text-center">
               Bitte gib dein neues Passwort ein.
@@ -285,16 +285,6 @@ export default function ResetPage() {
                 >
                   {busy ? "Speichere …" : "Passwort setzen"}
                 </button>
-
-                <p className="text-center text-[11px] text-slate-400 mt-4">
-                  Probleme?{" "}
-                  <a
-                    href="mailto:support@fahrenleicht.app"
-                    className="underline decoration-dotted hover:text-slate-200"
-                  >
-                    support@fahrenleicht.app
-                  </a>
-                </p>
               </>
             )}
           </div>

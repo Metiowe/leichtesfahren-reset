@@ -82,7 +82,7 @@ export default function HomePage() {
       {/* ✅ Grüner Hinweis */}
       {showResetNotice && (
         <div className="z-20 bg-emerald-500/90 text-white text-center py-3 px-4 font-semibold backdrop-blur border-b border-white/10">
-          Passwort aktualisiert – Weiterleitung zu FahrenLeicht …
+          Passwort aktualisiert – Weiterleitung zu DeutschLeicht …
         </div>
       )}
 
@@ -98,7 +98,7 @@ export default function HomePage() {
           <div className="h-16 w-16 flex items-center justify-center rounded-full bg-white/10 border border-white/10 shadow-md">
             <Image
               src="/icon.png"
-              alt="FahrenLeicht Icon"
+              alt="DeutschLeicht Icon"
               width={48}
               height={48}
               className="rounded-full object-cover"
@@ -107,7 +107,7 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-[26px] md:text-[30px] font-extrabold text-white tracking-tight">
-            FahrenLeicht
+            DeutschLeicht
           </h1>
 
           <p className="text-slate-300/85 text-sm md:text-[15px] text-center">
@@ -126,7 +126,7 @@ export default function HomePage() {
           className="glass w-full max-w-md rounded-3xl border border-white/10 shadow-2xl p-5 md:p-6"
         >
           <h2 className="text-white/95 text-lg md:text-xl font-extrabold mb-2">
-            Willkommen bei FahrenLeicht
+            Willkommen bei DeutschLeicht
           </h2>
 
           <p className="text-slate-300/85 text-sm md:text-[15px] mb-5">
@@ -136,19 +136,14 @@ export default function HomePage() {
           </p>
 
           {/* 🌐 Haupt-CTA → Webseite */}
-          <a
-            href="https://www.fahrenleicht.de"
-            target="_blank"
-            rel="noreferrer"
-            className="block"
-          >
+          <a href="" target="_blank" rel="noreferrer" className="block">
             <span
               className="w-full rounded-2xl py-3 font-extrabold tracking-wide
                          bg-gradient-to-r from-sky-500 to-indigo-600 hover:brightness-110
                          text-white transition flex items-center justify-center gap-2"
             >
               <FaExternalLinkAlt className="opacity-90" />
-              FahrenLeicht-Webseite besuchen
+              DeutschLeicht-Webseite besuchen
             </span>
           </a>
 
@@ -179,7 +174,7 @@ export default function HomePage() {
 
       {/* 🔻 Footer */}
       <footer className="z-10 w-full text-center text-[12.5px] text-slate-400/85 py-5">
-        © {new Date().getFullYear()} FahrenLeicht — Alle Rechte vorbehalten
+        © {new Date().getFullYear()} DeutschLeicht — Alle Rechte vorbehalten
       </footer>
     </div>
   );

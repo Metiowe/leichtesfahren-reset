@@ -2,7 +2,7 @@
 
 import nodemailer from "nodemailer";
 
-const FROM_NAME = process.env.SMTP_FROM_NAME || "FahrenLeicht Support";
+const FROM_NAME = process.env.SMTP_FROM_NAME || "DeutschLeicht Support";
 // Wir greifen auf deine Vercel-Variable zu, ansonsten Fallback auf die verifizierte Domain
 const FROM_EMAIL =
   process.env.SMTP_FROM_EMAIL ||
@@ -79,13 +79,13 @@ export default async function handler(req, res) {
     });
 
     const preheader =
-      "Hier kannst du dein Passwort für FahrenLeicht sicher zurücksetzen.";
+      "Hier kannst du dein Passwort für DeutschLeicht sicher zurücksetzen.";
     const html = `
 <!doctype html>
 <html lang="de">
 <head>
 <meta charset="utf-8" />
-<title>Passwort zurücksetzen – FahrenLeicht</title>
+<title>Passwort zurücksetzen – DeutschLeicht</title>
 <meta name="color-scheme" content="light dark">
 <style>
   body { margin:0; padding:0; background:#0b1220; }
@@ -122,7 +122,7 @@ export default async function handler(req, res) {
 <span style="display:none!important">${preheader}</span>
 <div class="bg">
   <div class="card">
-    <div class="header">FahrenLeicht – Passwort zurücksetzen</div>
+    <div class="header">DeutschLeicht – Passwort zurücksetzen</div>
     <div class="content">
       <p>Hallo,</p>
       <p>du hast eine Zurücksetzung deines Passworts angefordert. Klicke auf den folgenden Button, um ein neues Passwort zu vergeben:</p>
@@ -138,7 +138,7 @@ export default async function handler(req, res) {
       <p>Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren.</p>
     </div>
     <div class="footer">
-      Diese E-Mail wurde automatisch von FahrenLeicht gesendet.
+      Diese E-Mail wurde automatisch von DeutschLeicht gesendet.
     </div>
   </div>
 </div>
@@ -146,7 +146,7 @@ export default async function handler(req, res) {
 </html>`.trim();
 
     const text = [
-      "FahrenLeicht – Passwort zurücksetzen",
+      "DeutschLeicht – Passwort zurücksetzen",
       "",
       "Du hast eine Zurücksetzung deines Passworts angefordert.",
       "Öffne den folgenden Link in deinem Browser, um ein neues Passwort zu setzen:",
@@ -158,7 +158,7 @@ export default async function handler(req, res) {
     const info = await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: email,
-      subject: "🔐 Passwort zurücksetzen – FahrenLeicht",
+      subject: "🔐 Passwort zurücksetzen – DeutschLeicht",
       text,
       html,
     });

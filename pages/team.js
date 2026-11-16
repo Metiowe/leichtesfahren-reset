@@ -1,4 +1,4 @@
-// pages/team.tsx
+// 📂 pages/team.tsx
 "use client";
 
 import Head from "next/head";
@@ -12,10 +12,10 @@ export default function TeamPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100 text-gray-900 px-6 py-12">
       <Head>
-        <title>Unser Team – Leichtesfahren</title>
+        <title>Unser Team – DeutschLeicht</title>
         <meta
           name="description"
-          content="Lerne das Team hinter Leichtesfahren kennen – moderne Theorie-App für deinen Führerschein."
+          content="Lerne das Team hinter DeutschLeicht kennen – deine moderne App zum Deutschlernen mit System, Wortschatz und Grammatik."
         />
       </Head>
 
@@ -36,8 +36,9 @@ export default function TeamPage() {
         transition={{ delay: 0.4, duration: 0.6 }}
         className="text-center max-w-2xl mx-auto text-lg text-gray-700 mb-12"
       >
-        Hinter <strong>Leichtesfahren</strong> steht ein engagiertes Team, das
-        dir hilft, die Theorie modern, effizient und mit Freude zu lernen.
+        Hinter <strong>DeutschLeicht</strong> steht ein engagiertes Team, das
+        dir hilft, die deutsche Sprache modern, verständlich und mit Freude zu
+        lernen.
       </motion.p>
 
       {/* 👤 Mitglieder */}
@@ -75,7 +76,7 @@ export default function TeamPage() {
         transition={{ delay: 1.2 }}
         className="text-center mt-16 text-sm text-gray-500"
       >
-        Made with ❤️ by Leichtesfahren • {new Date().getFullYear()}
+        Made with ❤️ by DeutschLeicht • {new Date().getFullYear()}
       </motion.p>
     </div>
   );
@@ -84,20 +85,19 @@ export default function TeamPage() {
 const teamMembers = [
   {
     name: "Mahdi B.N",
-    role: "Gründer & Entwickler",
     role: "UX/UI Design\nGründer & Fullstack Entwickler",
     image: "/logo6.png",
     icon: "👨‍💻",
   },
   {
     name: "Simin M",
-    role: "Content & Mitentwicklung der\nPrüfungsfragen",
+    role: "Sprach-Content & Mitentwicklung\nder Deutsch-Übungen",
     image: "/logo6.png",
     icon: "✍️",
   },
   {
     name: "KI Logiksystem",
-    role: "Adaptive Analyse,\nLernverhalten & smarte\nOptimierung der Vorbereitung",
+    role: "Adaptive Analyse,\nLernverhalten & smarte\nOptimierung deines Sprachfortschritts",
     image: "/logo6.png",
     icon: "🤖",
   },
