@@ -30,8 +30,7 @@ export default async function handler(req, res) {
 
   try {
     // 🚀 DER LEBENSRETTENDE FIX: Wir zwingen Vercel zu HTTPS, egal was in der .env steht!
-    let backendBase =
-      process.env.NEXT_PUBLIC_API_BASE_URL || "https://87-106-200-105.nip.io";
+    let backendBase = "https://deutschleicht.duckdns.org";
     backendBase = backendBase.replace("http://", "https://").replace(/\/$/, "");
 
     const pythonEndpoint = `${backendBase}/auth/reset-password-request`;
